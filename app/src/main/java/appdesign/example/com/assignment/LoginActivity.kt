@@ -12,6 +12,7 @@ import java.util.*
 import com.facebook.login.LoginResult
 import org.jetbrains.anko.toast
 
+
 class LoginActivity : AppCompatActivity() {
 
     private val EMAIL = "email"
@@ -23,6 +24,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
 
         loginButton = findViewById<View>(R.id.login_button) as LoginButton
         loginButton.setReadPermissions(Arrays.asList(EMAIL))
@@ -41,11 +43,15 @@ class LoginActivity : AppCompatActivity() {
                         val lastName = currentProfile?.lastName
                         val id = currentProfile?.id
 
-                        logD("Id - $id, FirstName - $firstName, lastName - $lastName")
+                        if (firstName!=null){
+                            toast("Hello $firstName")
+                            logD("Id - $id, FirstName - $firstName, lastName - $lastName")
+                        }
                     }
                 }
                 if (isLoggedIn){
                     logD("User Logged In")
+                    finish()
                     val intent = Intent(this@LoginActivity, MainActivity::class.java)
                     startActivity(intent)
                 }else{
@@ -67,6 +73,8 @@ class LoginActivity : AppCompatActivity() {
 
         LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"))
     }
+
+
 
     private fun logD(message: String) {
         Log.d(TAG, message)

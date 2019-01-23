@@ -6,4 +6,5 @@
     <color name="secondaryColor">#18ffff</color>
     <color name="colorBlue">#3498DB</color>
     <color name="secondaryDarkColor">#00cbcc</color>
+    <color name="colorBackground">#191919</color>
 </resources>
