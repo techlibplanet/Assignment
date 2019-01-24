@@ -21,7 +21,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 import android.content.ActivityNotFoundException
 import android.provider.MediaStore.Images
-import android.content.pm.PackageManager
 
 
 class MainActivity() : AppCompatActivity() {
@@ -66,10 +65,6 @@ class MainActivity() : AppCompatActivity() {
         }
         libPermissions.askPermissions(runnable)
 
-        val sigs = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
-        for (sig in sigs) {
-            Log.i("MyApp", "Signature hashcode : " + sig.hashCode())
-        }
 
         camScanner.setOnClickListener {
 
