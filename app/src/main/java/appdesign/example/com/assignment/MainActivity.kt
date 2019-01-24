@@ -112,6 +112,7 @@ class MainActivity() : AppCompatActivity() {
                             .setPositiveButton(android.R.string.ok, null)
                             .create().show()
                     mBitmap = Util.loadBitmap(mOutputImagePath!!)
+                    imageView.setImageBitmap(mBitmap)
                 }
 
                 override fun onError(errorCode: Int) {
