@@ -15,11 +15,13 @@ import android.view.MenuItem
 import android.widget.ImageView
 import com.facebook.login.LoginManager
 import com.intsig.csopen.sdk.*
-import net.rmitsolutions.libcam.LibCamera
 import net.rmitsolutions.libcam.LibPermissions
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import android.content.ActivityNotFoundException
+import android.provider.MediaStore.Images
+import android.content.pm.PackageManager
 
 
 class MainActivity() : AppCompatActivity() {
@@ -27,10 +29,7 @@ class MainActivity() : AppCompatActivity() {
     private val TAG = MainActivity::class.java.simpleName
     private lateinit var camScanner: Button
     private lateinit var libPermissions: LibPermissions
-    private lateinit var libCamera: LibCamera
-    private var imageUri: Uri? = null
     val TAKE_PHOTO = 201
-    val CROP_PHOTO = 203
     private lateinit var imageView: ImageView
 
     private val DIR_IMAGE = Environment.getExternalStorageDirectory().absolutePath
@@ -58,8 +57,6 @@ class MainActivity() : AppCompatActivity() {
 
         mApi = CSOpenApiFactory.createCSOpenApi(this, Constants.APP_KEY, null)
 
-        libCamera = LibCamera(this)
-
         libPermissions = LibPermissions(this, permissions)
         imageView = findViewById(R.id.imageView)
         camScanner = findViewById(R.id.buttonCamScanner)
@@ -69,16 +66,26 @@ class MainActivity() : AppCompatActivity() {
         }
         libPermissions.askPermissions(runnable)
 
+        val sigs = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
+        for (sig in sigs) {
+            Log.i("MyApp", "Signature hashcode : " + sig.hashCode())
+        }
+
         camScanner.setOnClickListener {
 
             val runnable = Runnable {
-                libCamera.takePhoto()
+                val i = Intent(Intent.ACTION_PICK,
+                        Images.Media.EXTERNAL_CONTENT_URI)
+                i.type = "image/*"
+                try {
+                    startActivityForResult(i, TAKE_PHOTO)
+                } catch (e: ActivityNotFoundException) {
+                    e.printStackTrace()
+                }
+
             }
             libPermissions.askPermissions(runnable, "android.permission.CAMERA")
         }
-
-
-
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -144,13 +151,6 @@ class MainActivity() : AppCompatActivity() {
             }
         }
 
-        if (requestCode == CROP_PHOTO) {
-            if (data != null) {
-                imageUri = libCamera.cropImageActivityResult(requestCode, resultCode, data)!!
-                logD("Crop Image Uri - ${imageUri!!.path}")
-                imageView.setImageURI(imageUri)
-            }
-        }
     }
 
     private fun go2CamScanner() {
@@ -220,8 +220,6 @@ class MainActivity() : AppCompatActivity() {
         private val Tag = "MainActivity"
 
         private val APP_KEY = "KQEH6HfhePJaQd8h73TUA8HP"
-
-        private val DIR_IMAGE = Environment.getExternalStorageDirectory().absolutePath + "/CSOpenApiDemo"
 
         // three values for save instance;
         private val SCANNED_IMAGE = "scanned_img"
